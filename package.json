@@ -1,0 +1,31 @@
+{
+  "name": "opencase-server",
+  "version": "1.0.0",
+  "description": "Server for open case",
+  "main": "server.js",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "method-override": "^2.3.6",
+    "request": "^2.76.0",
+    "serve-favicon": "^2.3.0",
+    "firebase": "^3.5.2",
+    "winston": "^2.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VLADOS776/NodeJS-Server.git"
+  },
+  "author": "VLADOS776",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VLADOS776/NodeJS-Server/issues"
+  },
+  "homepage": "https://github.com/VLADOS776/NodeJS-Server#readme"
+}
