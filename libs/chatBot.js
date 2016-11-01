@@ -53,6 +53,7 @@ function listenChatRoom(room) {
         
         if (/^(!stats)/i.test(msg)) { //[ ]?@(.*?),
             var uid = snapshot.val().uid;
+            log.debug("!stats found! Uid: %s", uid);
             firebase.database().ref('users/'+uid).once('value')
             .then(function(data) {
                 var userInfo = data.val();
