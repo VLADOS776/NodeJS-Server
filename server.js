@@ -55,6 +55,6 @@ app.use(function(err, req, res, next) {
     return;
 });
 
-app.listen(1337, function() {
-    console.log('Express server on port 1337');
+app.listen(8080, function() {
+    console.log('Express server on port 8080');
 })
