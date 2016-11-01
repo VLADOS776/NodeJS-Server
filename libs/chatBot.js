@@ -15,11 +15,12 @@ function chatBotSendMsg(msg, room) {
     })
 }
 
-var lastMessages = {
-    RU: []
-};
+var lastMessages = {};
 
-var hello = ["Hello!", "Привет.", "Дратути", "Хай", "Тут я", "Кто звал?", "Слушаю", "Ало. Да, да. ChatBot, да", "у меня сосет @BloodY,", "@Пездюк228,"];
+var helloArr = {
+    RU: ["Hello!", "Привет.", "Дратути", "Хай", "Тут я", "Кто звал?", "Слушаю", "Ало. Да, да. ChatBot, да", "у меня сосет @BloodY,", "@Пездюк228,"],
+    EN: ["Hello!", "Sup?", "What m8?", "Hi", "What's up dog!", "Look at my horse! My horse is amazing!", "Hey"]
+}
 //function listen
 
 var items = [{
@@ -40,6 +41,7 @@ function listenChatRoom(room) {
         log.debug('%s: %s', snapshot.val().username, msg);
         
         if (/^[@]?(chatbot)/i.test(msg)) {
+            var hello = typeof helloArr[room] == 'undefined' ? helloArr.EN : helloArr[room];
             var sayHello = hello[Math.floor(Math.random()*(hello.length))];
             chatBotSendMsg(sayHello, room);
         }
@@ -49,7 +51,7 @@ function listenChatRoom(room) {
             chatBotSendMsg(textMsg, room);
         }
         
-        if (/^(!stats)[ ]?@(.*?),/i.test(msg)) {
+        if (/^(!stats)/i.test(msg)) { //[ ]?@(.*?),
             var uid = snapshot.val().uid;
             firebase.database().ref('users/'+uid).once('value')
             .then(function(data) {
