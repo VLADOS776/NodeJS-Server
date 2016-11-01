@@ -51,8 +51,18 @@ function listenChatRoom(room) {
             chatBotSendMsg(textMsg, room);
         }
         
-        if (/^(!stats)/i.test(msg)) { //[ ]?@(.*?),
+        if (/^(?:!stats)(?:[ ]?@(.*?),)?/i.test(msg)) {
             var uid = snapshot.val().uid;
+            var user = msg.match(/^(?:!stats)(?:[ ]?@(.*?),)?/i)[1];
+            log.debug('User: %s', user);
+            if (typeof user != 'undefined' && user != "") {
+                for (var i = 0; i < lastMessages[room].length; i++) {
+                    if (lastMessages[room][i].username == user) {
+                        uid = lastMessages[room][i].uid;
+                        break;
+                    }
+                }
+            }
             log.debug("!stats found! Uid: %s", uid);
             firebase.database().ref('users/'+uid).once('value')
             .then(function(data) {

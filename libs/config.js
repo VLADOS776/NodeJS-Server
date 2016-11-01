@@ -1,5 +1,5 @@
 chatBotConfig = {
-    img: "../images/ava/41.png",
+    img: "../images/ava/bot.jpg",
     username: "ChatBot"
 }
 
