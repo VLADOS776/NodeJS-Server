@@ -21,6 +21,11 @@ var helloArr = {
     RU: ["Hello!", "Привет.", "Дратути", "Хай", "Тут я", "Кто звал?", "Слушаю", "Ало. Да, да. ChatBot, да", "у меня сосет @BloodY,", "@Пездюк228,"],
     EN: ["Hello!", "Sup?", "What m8?", "Hi", "What's up dog!", "Look at my horse! My horse is amazing!", "Hey"]
 }
+
+var help = {
+    RU: "Доступные команды:<br><b>!stats</b> - Статистика игрока<br><b>!wp (id)</b> - информация об оружии по id (0-818).",
+    EN: "Aveable commands:<br><b>!stats</b> or <b>!stats@(nickname),</b> - Player statistic<br><b>!wp (id)</b> - get weapon info by id (0-818)"
+}
 //function listen
 
 var items = [{
@@ -33,7 +38,14 @@ function listenAllRooms() {
     log.debug('Listeting for all rooms');
     var rooms = "RU,EN,PL,DE,TR,PT,FR";
     
-    
+    var roomsArr = rooms.split(',');
+    for (var i = 0; i < roomsArr.length; i++) {
+        listenChatRoom(roomsArr[i]);
+    }
+}
+
+function getLocalizedArr(arr, room) {
+    return typeof arr[room] == 'undefined' ? arr.EN : arr[room];
 }
 
 function listenChatRoom(room) {
@@ -105,8 +117,10 @@ function listenChatRoom(room) {
                                        "\t\t\t\t↓\n"+
                                        "("+lastMessages[room][i].uid+")"+lastMessages[room][i].username+" \n================\n";
                     fs.appendFile(process.env.OPENSHIFT_DATA_DIR+'reported.txt', reportedLine, function(err) {
-                        if(err) throw err;
-                        
+                        if(err) {
+                            log.debug(err)
+                            throw err;
+                        }
                     });
                     break;
                 }
@@ -122,7 +136,7 @@ function listenChatRoom(room) {
         }
         
         if (/^!(?:help|commands|info)/i.test(msg)) {
-            var answer = "Доступные команды:<br><b>!stats</b> - Статистика игрока<br><b>!wp (id)</b> - информация об оружии по id (0-818).";
+            var answer = getLocalizedArr(help, room);
             chatBotSendMsg(answer, room);
         }
         
@@ -154,3 +168,4 @@ function getImgUrl(img, size) {
 
 module.exports.chatBotSendMsg = chatBotSendMsg;
 module.exports.listenChatRoom = listenChatRoom;
+module.exports.listenAllRooms = listenAllRooms;
