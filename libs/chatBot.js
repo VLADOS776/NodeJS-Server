@@ -24,7 +24,7 @@ var helloArr = {
 
 var help = {
     RU: "Доступные команды:<br><b>!stats</b> - Статистика игрока<br><b>!wp (id)</b> - информация об оружии по id (0-818).",
-    EN: "Aveable commands:<br><b>!stats</b> or <b>!stats@(nickname),</b> - Player statistic<br><b>!wp (id)</b> - get weapon info by id (0-818)"
+    EN: "Available commands:<br><b>!stats</b> or <b>!stats@(nickname),</b> - Player statistic<br><b>!wp (id)</b> - get weapon info by id (0-818)"
 }
 //function listen
 
