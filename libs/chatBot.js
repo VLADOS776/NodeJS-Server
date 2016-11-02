@@ -29,6 +29,13 @@ var items = [{
     "img": "-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXX7gNTPcUmqBxiQE3CQOHj05yGCgkjdVdTsL6mKAI416bMIW1Aud7vxIHdkqCsMOmJwGgJvZIlj6fR-4vX_1cVUg"
 }];
 
+function listenAllRooms() {
+    log.debug('Listeting for all rooms');
+    var rooms = "RU,EN,PL,DE,TR,PT,FR";
+    
+    
+}
+
 function listenChatRoom(room) {
     var chatRef = firebase.database().ref('chat/'+room);
     chatRef.limitToLast(1).on('child_added', function(snapshot) {
@@ -54,7 +61,6 @@ function listenChatRoom(room) {
         if (/^(?:!stats)(?:[ ]?@(.*?),)?/i.test(msg)) {
             var uid = snapshot.val().uid;
             var user = msg.match(/^(?:!stats)(?:[ ]?@(.*?),)?/i)[1];
-            log.debug('User: %s', user);
             if (typeof user != 'undefined' && user != "") {
                 for (var i = 0; i < lastMessages[room].length; i++) {
                     if (lastMessages[room][i].username == user) {
@@ -63,11 +69,9 @@ function listenChatRoom(room) {
                     }
                 }
             }
-            log.debug("!stats found! Uid: %s", uid);
             firebase.database().ref('users/'+uid).once('value')
             .then(function(data) {
                 var userInfo = data.val();
-                log.debug('msg: %s', userInfo.public.nickname);
                 var textMsg = "@"+userInfo.public.nickname+", "+userInfo.public.points+" EXP | "+userInfo.private.double+" double | Trades: "+(userInfo.public.betaTrade == true ? "On" : "Off");
                 if (typeof userInfo.moder != 'undefined' && typeof userInfo.moder.tradeban != 'undefined')
                     textMsg+= " | Tradeban: \""+userInfo.moder.tradeban+"\"";
@@ -83,7 +87,6 @@ function listenChatRoom(room) {
                 var wpInfo = data.val();
                 var textMsg = "<img src=\""+getImgUrl(wpInfo.img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
                             "<br>"+wpInfo.type+" | "+wpInfo.skinName;
-                log.debug("chatbot msg: %s", textMsg);
                 chatBotSendMsg(textMsg, room);
             })
         }
@@ -101,7 +104,10 @@ function listenChatRoom(room) {
                     var reportedLine = new Date().toLocaleString("ru")+"\n("+msgInfo.uid+") "+msgInfo.username+": "+reason+" \n" +
                                        "\t\t\t\t↓\n"+
                                        "("+lastMessages[room][i].uid+")"+lastMessages[room][i].username+" \n================\n";
-                    fs.appendFile('reported.txt', reportedLine);
+                    fs.appendFile(process.env.OPENSHIFT_DATA_DIR+'reported.txt', reportedLine, function(err) {
+                        if(err) throw err;
+                        
+                    });
                     break;
                 }
             }
