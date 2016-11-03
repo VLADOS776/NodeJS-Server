@@ -100,9 +100,11 @@ function listenChatRoom(room) {
             var wpNum = parseInt(snapshot.val().text.match(/^!(?:wp|weapon)[ ]?(\d+)/i)[1]);
             log.debug('Weapon num: '+wpNum);
             var wpInfo = weapons.getWeaponById(wpNum);
-            var textMsg = "<img src=\""+getImgUrl(wpInfo.img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
+            if (wpInfo) {
+                var textMsg = "<img src=\""+getImgUrl(wpInfo.img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
                         "<br>"+wpInfo.type+" | "+wpInfo.skinName;
-            chatBotSendMsg(textMsg, room);
+                chatBotSendMsg(textMsg, room);
+            }
         }
         
         if (/^!(?:report)[ ]?@(.*?),(.*$)?/i.test(msg)) {

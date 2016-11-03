@@ -1,4 +1,5 @@
 function getWeaponById(id) {
+    if (id > weapons.length) return null;
 	var wp = weapons[id];
 	if (wp.id != id) {
 		for (var i = 0; i < weapons.length; i++)
