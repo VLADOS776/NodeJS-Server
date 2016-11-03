@@ -64,6 +64,12 @@ function listenChatRoom(room) {
         }
         log.debug('%s: %s', snapshot.val().username, msg);
         
+        if (typeof lastMessages[room] == 'undefined')
+            lastMessages[room] = [];
+        if (lastMessages[room].length > 15) 
+            lastMessages[room] = lastMessages[room].slice(1);
+        lastMessages[room].push(msgInfo);
+        
         if (/^[@]?(chatbot)/i.test(msg)) {
             var hello = typeof helloArr[room] == 'undefined' ? helloArr.EN : helloArr[room];
             var sayHello = hello[Math.floor(Math.random()*(hello.length))];
@@ -148,11 +154,6 @@ function listenChatRoom(room) {
             log.debug(lastMessages);
         }     */   
         //Last messages log
-        if (typeof lastMessages[room] == 'undefined')
-            lastMessages[room] = [];
-        if (lastMessages[room].length > 15) 
-            lastMessages[room] = lastMessages[room].slice(1);
-        lastMessages[room].push(msgInfo);
     })
 }
 
