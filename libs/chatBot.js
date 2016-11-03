@@ -1,5 +1,6 @@
 var firebase        = require('firebase');
 var config          = require('./config');
+var weapons         = require('./weapons');
 var log             = require('./log')(module);
 var fs              = require('fs');
 //var bashOrg         = require('./steam');
@@ -42,6 +43,10 @@ function listenAllRooms() {
     for (var i = 0; i < roomsArr.length; i++) {
         listenChatRoom(roomsArr[i]);
     }
+}
+
+function stopListen(rooms) {
+    
 }
 
 function getLocalizedArr(arr, room) {
@@ -94,13 +99,10 @@ function listenChatRoom(room) {
         if (/^!(?:wp|weapon)[ ]?(\d+)/i.test(msg)) {
             var wpNum = parseInt(snapshot.val().text.match(/^!(?:wp|weapon)[ ]?(\d+)/i)[1]);
             log.debug('Weapon num: '+wpNum);
-            firebase.database().ref('weapons/'+wpNum).once('value')
-            .then(function(data) {
-                var wpInfo = data.val();
-                var textMsg = "<img src=\""+getImgUrl(wpInfo.img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
-                            "<br>"+wpInfo.type+" | "+wpInfo.skinName;
-                chatBotSendMsg(textMsg, room);
-            })
+            var wpInfo = weapons.getWeaponById(wpNum);
+            var textMsg = "<img src=\""+getImgUrl(wpInfo.img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
+                        "<br>"+wpInfo.type+" | "+wpInfo.skinName;
+            chatBotSendMsg(textMsg, room);
         }
         
         if (/^!(?:report)[ ]?@(.*?),(.*$)?/i.test(msg)) {
