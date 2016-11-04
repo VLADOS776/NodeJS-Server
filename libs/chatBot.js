@@ -77,7 +77,7 @@ function listenChatRoom(room) {
         }
         
         if (/^!(donate|patreon)/i.test(msg)) {
-            var textMsg = "<a href=\"https://www.patreon.com/VLADOS776\" target=\"_blank\">Patreon</a><br><div onclick='if(isAndroid()){client.showVideoAd(\"#\")}' style='padding: 5px;background: #63a7ff;color: #fff;border-radius: 10px;text-align: center;text-shadow: 1px 1px RGBA(0, 0, 0, 0.42);border-bottom: 2px solid #186ad7;'>Watch ad</div>";
+            var textMsg = "<div style=\"padding: 5px;background: #E6461A;color: #fff;border-radius: 10px;text-align: center;text-shadow: 1px 1px RGBA(0, 0, 0, 0.42);border-bottom: 2px solid #953419;margin-bottom: 5px;\"><a href=\"https://www.patreon.com/VLADOS776\" target=\"_blank\" style=\"text-decoration: none;color: #fff;display: block;\">Patreon</a></div><div onclick='if(isAndroid()){client.showVideoAd(\"#\")}' style=\"padding: 5px;background: #63a7ff;color: #fff;border-radius: 10px;text-align: center;text-shadow: 1px 1px RGBA(0, 0, 0, 0.42);border-bottom: 2px solid #186ad7;\">Watch ad</div>";
             chatBotSendMsg(textMsg, room);
         }
         
