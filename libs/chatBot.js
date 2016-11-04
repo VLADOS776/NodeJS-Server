@@ -77,7 +77,7 @@ function listenChatRoom(room) {
         }
         
         if (/^!(donate|patreon)/i.test(msg)) {
-            var textMsg = "<a href=\"https://www.patreon.com/VLADOS776\" target=\"_blank\">Patreon</a>"
+            var textMsg = "<a href=\"https://www.patreon.com/VLADOS776\" target=\"_blank\">Patreon</a><br><div onclick='if(isAndroid()){client.showVideoAd(\"#\")}' style='padding: 5px;background: #63a7ff;color: #fff;border-radius: 10px;text-align: center;text-shadow: 1px 1px RGBA(0, 0, 0, 0.42);border-bottom: 2px solid #186ad7;'>Watch ad</div>";
             chatBotSendMsg(textMsg, room);
         }
         
@@ -112,6 +112,8 @@ function listenChatRoom(room) {
                 chatBotSendMsg(textMsg, room);
             }
         }
+        
+        //if(/^!(?:trade))
         
         if (/^!(?:report)[ ]?@(.*?),(.*$)?/i.test(msg)) {
             var reported = msg.match(/^!(?:report)[ ]?@(.*?),(.*$)?/i)[1];
