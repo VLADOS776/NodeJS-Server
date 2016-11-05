@@ -1,6 +1,7 @@
 var firebase        = require('firebase');
 var config          = require('./config');
 var weapons         = require('./weapons');
+var joke            = require('./joke');
 var log             = require('./log')(module);
 var fs              = require('fs');
 //var bashOrg         = require('./steam');
@@ -19,7 +20,7 @@ function chatBotSendMsg(msg, room) {
 var lastMessages = {};
 
 var helloArr = {
-    RU: ["Hello!", "Привет.", "Дратути", "Хай", "Тут я", "Кто звал?", "Слушаю", "Ало. Да, да. ChatBot, да", "у меня сосет @BloodY,", "@Пездюк228,"],
+    RU: ["Hello!", "Привет.", "Дратути", "Хай", "Тут я", "Кто звал?", "Слушаю", "Ало. Да, да. ChatBot, да"],
     EN: ["Hello!", "Sup?", "What m8?", "Hi", "What's up dog!", "Look at my horse! My horse is amazing!", "Hey"]
 }
 
@@ -114,6 +115,13 @@ function listenChatRoom(room) {
             }
         }
         
+        if (/^!(?:joke|шутка)/i.test(msg)) {
+            joke('RU')
+            .then(function(joke) {
+                chatBotSendMsg(joke, room);
+            })
+        }
+        
         //if(/^!(?:trade))
         
         if (/^!(?:report)[ ]?@(.*?),(.*$)?/i.test(msg)) {
@@ -153,19 +161,22 @@ function listenChatRoom(room) {
             chatBotSendMsg(answer, room);
         }
         
-        //resetsTimeout[room] = setTimeout(clearChat(room), config.chat.clearTimeout);
     })
+        resetsTimeout[room] = setTimeout(clearChat(room), config.chat.clearTimeout);
+        log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
 }
 
-function clearChat (ref) {
-    var chatRef = firebase.database().ref('chat/'+ref);
+function clearChat (room) {
+    var chatRef = firebase.database().ref('chat/'+room);
     (function(chatRef) {
         chatRef.limitToLast(40).once('value', function(snapshot) {
             chatRef.set(snapshot.val());
+            
+            log.debug("Chat room: '"+room+"' was cleared!");
+            clearTimeout(resetsTimeout[room]);
+            resetsTimeout[room] = setTimeout(function() {clearChat(room)}, config.chat.clearTimeout);
         });
     })(chatRef)
-    log.debug("Chat room: '"+ref+"' was cleared!");
-    resetsTimeout[room] = setTimeout(clearChat(room), config.chat.clearTimeout);
 }
 
 function getImgUrl(img, size) {

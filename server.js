@@ -7,6 +7,7 @@ var methodOverride   = require('method-override');
 var log              = require('./libs/log')(module);
 var fbDB             = require('./libs/firebaseDatabase');
 var chatBot          = require('./libs/chatBot');
+var jokes            = require('./libs/joke');
 
 var app          = express();
 
@@ -31,10 +32,18 @@ app.get('/api/chatBot', function(req, res) {
     log.debug('Chatbot params: %s', req.query);
     if (req.query.command == 'listen') {
         chatBot.listenChatRoom(req.query.room);
-    } else if (req.query.command == 'clearRoom') {
-        chatBot.clearRoom(req.query.room);
+    } else if (req.query.command == 'clearChat') {
+        chatBot.clearChat(req.query.room);
     }
     res.send('{success: true}');
+})
+
+app.get('/api/joke', function(req, res) {
+    log.debug("joke!");
+    jokes()
+    .then(function(joke) {
+        res.send(joke);
+    })
 })
 
 app.get('/api', function(req, res) {
@@ -56,6 +65,7 @@ app.use(function(err, req, res, next) {
 });
 
 chatBot.listenAllRooms();
+//chatBot.listenChatRoom('FR');
 
 app.listen(8080, function() {
     console.log('Express server on port 8080');
