@@ -27,7 +27,8 @@ var help = {
     RU: "Доступные команды:<br><b>!stats</b> - Статистика игрока<br><b>!wp (id)</b> - информация об оружии по id (0-818).",
     EN: "Available commands:<br><b>!stats</b> or <b>!stats@(nickname),</b> - Player statistic<br><b>!wp (id)</b> - get weapon info by id (0-818)"
 }
-//function listen
+
+var resetsTimeout = {};
 
 var items = [{
     "type" : "item",
@@ -152,11 +153,19 @@ function listenChatRoom(room) {
             chatBotSendMsg(answer, room);
         }
         
-        /*if (/^!lastmsg/.test(msg)) {
-            log.debug(lastMessages);
-        }     */   
-        //Last messages log
+        //resetsTimeout[room] = setTimeout(clearChat(room), config.chat.clearTimeout);
     })
+}
+
+function clearChat (ref) {
+    var chatRef = firebase.database().ref('chat/'+ref);
+    (function(chatRef) {
+        chatRef.limitToLast(40).once('value', function(snapshot) {
+            chatRef.set(snapshot.val());
+        });
+    })(chatRef)
+    log.debug("Chat room: '"+ref+"' was cleared!");
+    resetsTimeout[room] = setTimeout(clearChat(room), config.chat.clearTimeout);
 }
 
 function getImgUrl(img, size) {
@@ -176,3 +185,4 @@ function getImgUrl(img, size) {
 module.exports.chatBotSendMsg = chatBotSendMsg;
 module.exports.listenChatRoom = listenChatRoom;
 module.exports.listenAllRooms = listenAllRooms;
+module.exports.clearChat = clearChat;
