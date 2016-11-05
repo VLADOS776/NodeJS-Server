@@ -32,7 +32,7 @@ app.get('/api/chatBot', function(req, res) {
     if (req.query.command == 'listen') {
         chatBot.listenChatRoom(req.query.room);
     } else if (req.query.command == 'clearRoom') {
-        chatbot.clearRoom(req.query.room);
+        chatBot.clearRoom(req.query.room);
     }
     res.send('{success: true}');
 })
