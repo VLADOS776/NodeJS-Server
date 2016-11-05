@@ -31,8 +31,8 @@ app.get('/api/chatBot', function(req, res) {
     log.debug('Chatbot params: %s', req.query);
     if (req.query.command == 'listen') {
         chatBot.listenChatRoom(req.query.room);
-    } else {
-        chatBot.chatBotSendMsg('Hello!', req.query.room);
+    } else if (req.query.command == 'clearRoom') {
+        chatbot.clearRoom(req.query.room);
     }
     res.send('{success: true}');
 })

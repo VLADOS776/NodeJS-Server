@@ -3,7 +3,7 @@ chatBotConfig = {
     username: "ChatBot"
 }
 chat = {
-    clearTimeout = 60000*30 //Очищать чат раз в 30 минут
+    clearTimeout: 60000*30 //Очищать чат раз в 30 минут
 }
 
 module.exports.chatBot = chatBotConfig;
