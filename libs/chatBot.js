@@ -25,8 +25,8 @@ var helloArr = {
 }
 
 var help = {
-    RU: "Доступные команды:<br><b>!stats</b> - Статистика игрока<br><b>!wp (id)</b> - информация об оружии по id (0-818).",
-    EN: "Available commands:<br><b>!stats</b> or <b>!stats@(nickname),</b> - Player statistic<br><b>!wp (id)</b> - get weapon info by id (0-818)"
+    RU: "Доступные команды:<br><b>!stats</b> - Статистика игрока<br><b>!wp (id)</b> или <b>!weapon (id)</b> - информация об оружии по id (0-818)<br><b>!donate</b> - Ссылка на Patreon и кнопка для показа рекламы<br><b>!joke</b> или <b>!шутка</b> - случайная шутка",
+    EN: "Available commands:<br><b>!stats</b> or <b>!stats@(nickname),</b> - Player statistic<br><b>!wp (id)</b> or <b>!weapon (id)</b> - get weapon info by id (0-818)<br><b>!donate</b> - Link to Patreon and button that shows video ad.<br><b>!joke</b> - random joke (temporarily only in Russian)"
 }
 
 var resetsTimeout = {};
@@ -39,7 +39,7 @@ var items = [{
 
 function listenAllRooms() {
     log.debug('Listeting for all rooms');
-    var rooms = "RU,EN,PL,DE,TR,PT,FR";
+    var rooms = "RU,EN,PL,DE,TR,RO,FI,PT,FR";
     
     var roomsArr = rooms.split(',');
     for (var i = 0; i < roomsArr.length; i++) {
