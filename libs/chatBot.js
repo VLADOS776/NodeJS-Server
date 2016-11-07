@@ -161,6 +161,11 @@ function listenChatRoom(room) {
             chatBotSendMsg(answer, room);
         }
         
+        if (/^!(?:double)/i.test(msg)) {
+            var answer = '<a href="double-Online.html">Double online beta</a>'
+            chatBotSendMsg(answer, room);
+        }
+        
     })
         resetsTimeout[room] = setTimeout(clearChat(room), config.chat.clearTimeout);
         log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
