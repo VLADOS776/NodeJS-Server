@@ -1,14 +1,19 @@
 function getWeaponById(id) {
-    if (id > weapons.length) return null;
-    var wp = weapons[id];
-    if (wp.id != id) {
-        for (var i = 0; i < weapons.length; i++)
-            if (weapons[i].id === id) {
-                wp = weapons[i];
-                break;
-            }
+    try {
+        if (id > weapons.length) return null;
+        var wp = weapons[id];
+        if (typeof wp == 'undefined') return null;
+        if (wp.id != id) {
+            for (var i = 0; i < weapons.length; i++)
+                if (weapons[i].id === id) {
+                    wp = weapons[i];
+                    break;
+                }
+        }
+        return wp;
+    }catch (e) {
+        return null;
     }
-    return wp;
 }
 var weapons = [{
     id: 0

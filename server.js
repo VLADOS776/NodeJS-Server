@@ -9,7 +9,7 @@ var fbDB             = require('./libs/firebaseDatabase');
 var chatBot          = require('./libs/chatBot');
 var jokes            = require('./libs/joke');
 
-var app          = express();
+var app              = express();
 
 app.use(favicon(__dirname + '/public/favicon.ico'));
 //app.use(express.logger('dev'));
