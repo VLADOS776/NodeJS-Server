@@ -2,6 +2,7 @@ var firebase        = require('firebase');
 var config          = require('./config');
 var weapons         = require('./weapons');
 var joke            = require('./joke');
+var steam           = require('./steam');
 var log             = require('./log')(module);
 var fs              = require('fs');
 //var bashOrg         = require('./steam');
@@ -25,8 +26,18 @@ var helloArr = {
 }
 
 var help = {
-    RU: "Доступные команды:<br><b>!stats</b> - Статистика игрока<br><b>!wp (id)</b> или <b>!weapon (id)</b> - информация об оружии по id (0-818)<br><b>!donate</b> - Ссылка на Patreon и кнопка для показа рекламы<br><b>!joke</b> или <b>!шутка</b> - случайная шутка",
-    EN: "Available commands:<br><b>!stats</b> or <b>!stats@(nickname),</b> - Player statistic<br><b>!wp (id)</b> or <b>!weapon (id)</b> - get weapon info by id (0-818)<br><b>!donate</b> - Link to Patreon and button that shows video ad.<br><b>!joke</b> - random joke (temporarily only in Russian)"
+    RU: `Доступные команды:<br>
+        <b>!stats</b> - Статистика игрока<br>
+        <b>!wp (id)</b> или <b>!weapon (id)</b> - информация об оружии по id (0-818)<br>
+        <b>!donate</b> - Ссылка на Patreon и кнопка для показа рекламы<br>
+        <b>!steam (steamID)</b> - немного информации о профиле в стим<br>
+        <b>!joke</b> или <b>!шутка</b> - случайная шутка`,
+    EN: `Available commands:<br>
+        <b>!stats</b> or <b>!stats@(nickname),</b> - Player statistic<br>
+        <b>!wp (id)</b> or <b>!weapon (id)</b> - get weapon info by id (0-818)<br>
+        <b>!donate</b> - Link to Patreon and button that shows video ad.<br>
+        <b>!steam (steamID)</b> - Steam info<br>
+        <b>!joke</b> - random joke (temporarily only in Russian)`
 }
 
 var resetsTimeout = {};
@@ -83,7 +94,7 @@ function listenChatRoom(room) {
             chatBotSendMsg(textMsg, room);
         }
         
-        if (/^(?:!stats)(?:[ ]?@(.*?),)?/i.test(msg)) {
+        if (/^(?:!stats)(?: ?@(.*?),)?/i.test(msg)) {
             var uid = snapshot.val().uid;
             var user = msg.match(/^(?:!stats)(?:[ ]?@(.*?),)?/i)[1];
             if (typeof user != 'undefined' && user != "") {
@@ -104,7 +115,7 @@ function listenChatRoom(room) {
             })
         }
         
-        if (/^!(?:wp|weapon)[ ]?(\d+)/i.test(msg)) {
+        if (/^!(?:wp|weapon) ?(\d+)/i.test(msg)) {
             var wpNum = parseInt(snapshot.val().text.match(/^!(?:wp|weapon)[ ]?(\d+)/i)[1]);
             log.debug('Weapon num: '+wpNum);
             var wpInfo = weapons.getWeaponById(wpNum);
@@ -124,7 +135,7 @@ function listenChatRoom(room) {
         
         //if(/^!(?:trade))
         
-        if (/^!(?:report)[ ]?@(.*?),(.*$)?/i.test(msg)) {
+        if (/^!(?:report) ?@(.*?),(.*$)?/i.test(msg)) {
             var reported = msg.match(/^!(?:report)[ ]?@(.*?),(.*$)?/i)[1];
             var reason   = msg.match(/^!(?:report)[ ]?@(.*?),(.*$)?/i)[2];
             log.debug('Reported: %s. Reason: %s', reported, reason);
@@ -148,7 +159,7 @@ function listenChatRoom(room) {
             }
         }
         
-        if (/^!(?:item|itm)[ ]?(\d+)/i.test(msg)) {
+        if (/^!(?:item|itm) ?(\d+)/i.test(msg)) {
             var itmNum = parseInt(msg.match(/^!(?:item|itm)[ ]?(\d+)/i)[1]);
             if (typeof items[itmNum] == 'undefined') return;
             var textMsg = "<img src=\""+getImgUrl(items[itmNum].img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
@@ -161,9 +172,19 @@ function listenChatRoom(room) {
             chatBotSendMsg(answer, room);
         }
         
-        if (/^!(?:double)/i.test(msg)) {
-            var answer = '<a href="double-Online.html">Double online beta</a>'
-            chatBotSendMsg(answer, room);
+        if (/^!(?:steam) (.*?)$/i.test(msg)) {
+            var steamID = msg.match(/^!(?:steam) (.*?)$/i)[1];
+            if (steamID) {
+                steam.profile(steamID)
+                .then(function(profile) {
+                    var answer = steam.profileToString(profile);
+                    chatBotSendMsg(answer, room);
+                })
+                .catch(function(err) {
+                    var answer = `User ${req.params.id} not found.`;
+                    chatBotSendMsg(answer, room);
+                })
+            }
         }
         
     })

@@ -8,6 +8,7 @@ var log              = require('./libs/log')(module);
 var fbDB             = require('./libs/firebaseDatabase');
 var chatBot          = require('./libs/chatBot');
 var jokes            = require('./libs/joke');
+var steam            = require('./libs/steam');
 
 var app              = express();
 
@@ -46,6 +47,18 @@ app.get('/api/joke', function(req, res) {
     })
 })
 
+app.get('/api/steam/:id', function(req, res) {
+    //res.send(`Steam id: ${req.params.id}`);
+    steam.profile(req.params.id)
+    .then(function(profile) {
+        res.send(steam.profileToString(profile));
+        
+    })
+    .catch(function(err) {
+        res.send(`User ${req.params.id} not found.`);
+    })
+});
+
 app.get('/api', function(req, res) {
     res.send('API is running');
 });
@@ -65,7 +78,7 @@ app.use(function(err, req, res, next) {
 });
 
 chatBot.listenAllRooms();
-//chatBot.listenChatRoom('FR');
+//chatBot.listenChatRoom("FR");
 
 app.listen(8080, function() {
     console.log('Express server on port 8080');
