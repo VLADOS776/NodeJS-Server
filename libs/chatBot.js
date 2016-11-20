@@ -107,8 +107,9 @@ function listenChatRoom(room) {
             }
             firebase.database().ref('users/'+uid).once('value')
             .then(function(data) {
+                var balanceRegExp = /(\d)(?=(\d\d\d)+([^\d]|$))/g;
                 var userInfo = data.val();
-                var textMsg = "@"+userInfo.public.nickname+", "+userInfo.public.points+" EXP | "+userInfo.private.double+" double | Trades: "+(userInfo.public.betaTrade == true ? "On" : "Off");
+                var textMsg = "@"+userInfo.public.nickname+", "+userInfo.public.points+" EXP | "+((""+userInfo.private.double).replace(balanceRegExp, '$1&#8198;'))+" double | Trades: "+(userInfo.public.betaTrade == true ? "On" : "Off");
                 if (typeof userInfo.moder != 'undefined' && typeof userInfo.moder.tradeban != 'undefined')
                     textMsg+= " | Tradeban: \""+userInfo.moder.tradeban+"\"";
                 chatBotSendMsg(textMsg, room);
