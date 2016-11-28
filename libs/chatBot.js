@@ -94,7 +94,7 @@ function listenChatRoom(room) {
             chatBotSendMsg(textMsg, room);
         }
         
-        if (/^(?:!stats)(?: ?@(.*?),)?/i.test(msg)) {
+        if (/^(?:!stats)(?:[ ]?@(.*?),)?/i.test(msg)) {
             var uid = snapshot.val().uid;
             var user = msg.match(/^(?:!stats)(?:[ ]?@(.*?),)?/i)[1];
             if (typeof user != 'undefined' && user != "") {
@@ -109,14 +109,14 @@ function listenChatRoom(room) {
             .then(function(data) {
                 var balanceRegExp = /(\d)(?=(\d\d\d)+([^\d]|$))/g;
                 var userInfo = data.val();
-                var textMsg = "@"+userInfo.public.nickname+", "+userInfo.public.points+" EXP | "+((""+userInfo.private.double).replace(balanceRegExp, '$1&#8198;'))+" double | Trades: "+(userInfo.public.betaTrade == true ? "On" : "Off");
+                var textMsg = "@"+userInfo.public.nickname+", " + calcLvl(userInfo.public.points) + " LVL | "+((""+userInfo.private.double).replace(balanceRegExp, '$1&#8198;'))+" double | Trades: "+(userInfo.public.betaTrade == true ? "On" : "Off");
                 if (typeof userInfo.moder != 'undefined' && typeof userInfo.moder.tradeban != 'undefined')
                     textMsg+= " | Tradeban: \""+userInfo.moder.tradeban+"\"";
                 chatBotSendMsg(textMsg, room);
             })
         }
         
-        if (/^!(?:wp|weapon) ?(\d+)/i.test(msg)) {
+        if (/^!(?:wp|weapon)[ ]?(\d+)/i.test(msg)) {
             var wpNum = parseInt(snapshot.val().text.match(/^!(?:wp|weapon)[ ]?(\d+)/i)[1]);
             log.debug('Weapon num: '+wpNum);
             var wpInfo = weapons.getWeaponById(wpNum);
@@ -136,7 +136,7 @@ function listenChatRoom(room) {
         
         //if(/^!(?:trade))
         
-        if (/^!(?:report) ?@(.*?),(.*$)?/i.test(msg)) {
+        if (/^!(?:report)[ ]?@(.*?),(.*$)?/i.test(msg)) {
             var reported = msg.match(/^!(?:report)[ ]?@(.*?),(.*$)?/i)[1];
             var reason   = msg.match(/^!(?:report)[ ]?@(.*?),(.*$)?/i)[2];
             log.debug('Reported: %s. Reason: %s', reported, reason);
@@ -160,7 +160,7 @@ function listenChatRoom(room) {
             }
         }
         
-        if (/^!(?:item|itm) ?(\d+)/i.test(msg)) {
+        if (/^!(?:item|itm)[ ]?(\d+)/i.test(msg)) {
             var itmNum = parseInt(msg.match(/^!(?:item|itm)[ ]?(\d+)/i)[1]);
             if (typeof items[itmNum] == 'undefined') return;
             var textMsg = "<img src=\""+getImgUrl(items[itmNum].img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
@@ -191,6 +191,23 @@ function listenChatRoom(room) {
     })
         resetsTimeout[room] = setTimeout(clearChat(room), config.chat.clearTimeout);
         log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
+}
+
+function calcLvl(exp) {
+    exp = exp || 0;
+    var i = 1;
+    while (true) {
+        if (exp < lvlEXP(i))
+            return i-1;
+        i++;
+      }
+}
+
+function lvlEXP(lvl) {
+    if (lvl <= 1) 
+        return 0;
+    else 
+        return lvlEXP(lvl-1) + lvl*2;
 }
 
 function clearChat (room) {
