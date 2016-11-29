@@ -28,13 +28,13 @@ var helloArr = {
 var help = {
     RU: `Доступные команды:<br>
         <b>!stats</b> - Статистика игрока<br>
-        <b>!wp (id)</b> или <b>!weapon (id)</b> - информация об оружии по id (0-818)<br>
+        <b>!wp (id)</b> или <b>!weapon (id)</b> - информация об оружии по id (0-${(weapons.count)})<br>
         <b>!donate</b> - Ссылка на Patreon и кнопка для показа рекламы<br>
         <b>!steam (steamID)</b> - немного информации о профиле в стим<br>
         <b>!joke</b> или <b>!шутка</b> - случайная шутка`,
     EN: `Available commands:<br>
         <b>!stats</b> or <b>!stats@(nickname),</b> - Player statistic<br>
-        <b>!wp (id)</b> or <b>!weapon (id)</b> - get weapon info by id (0-818)<br>
+        <b>!wp (id)</b> or <b>!weapon (id)</b> - get weapon info by id (0-${(weapons.count)})<br>
         <b>!donate</b> - Link to Patreon and button that shows video ad.<br>
         <b>!steam (steamID)</b> - Steam info<br>
         <b>!joke</b> - random joke (temporarily only in Russian)`
@@ -46,6 +46,10 @@ var items = [{
     "type" : "item",
     "skinName": "Name Tag",
     "img": "-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXX7gNTPcUmqBxiQE3CQOHj05yGCgkjdVdTsL6mKAI416bMIW1Aud7vxIHdkqCsMOmJwGgJvZIlj6fR-4vX_1cVUg"
+}, {
+    "type" : "DreamHack Cluj-Napoca",
+    "skinName": "VLADOS776",
+    "img": "VLADOS776DreamHack.png"
 }];
 
 function listenAllRooms() {
