@@ -132,7 +132,7 @@ function listenChatRoom(room) {
         }
         
         if (/^!(?:joke|шутка)/i.test(msg)) {
-            joke('RU')
+            joke(room)
             .then(function(joke) {
                 chatBotSendMsg(joke, room);
             })
