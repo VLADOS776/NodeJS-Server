@@ -1,5 +1,7 @@
 var request = require("request");
-    //cheerio = require("cheerio");
+var r       = require("nraw");
+
+var Reddit = new r('ChatBot');
 
 var url = {
     RU: "http://bash.im/forweb/?u",
@@ -7,8 +9,10 @@ var url = {
 };
 var prefix = {
     RU: "<b>Случайная шутка:</b><br>",
-    EN: "<b>Random joke:</b><br>"
+    EN: "<b>Random joke from /r/Jokes:</b><br>"
 }
+
+
 
 var timeout = 0;
 
@@ -49,17 +53,9 @@ function RussianJoke() {
 }
 function EnglishJoke() {
     return new Promise(function(resolve, reject){
-        request(url.EN, function(error, response, body) {
-            if(!error) {
-                var response = JSON.parse(body);
-                var joke = body.match(/padding: 1em 0;">(.*?)<' \+ '\/div>/)[1];
-                joke = joke.replace(/<' \+ 'br(?: \/)?>/gi, '<br>');
-                timeout = Date.now();
-                resolve(joke);
-            } else {
-                console.log('Error: '+error);
-                reject(error);
-            }
+        Reddit.subreddit('Jokes').sort('top').random().limit(1).exec(function(data) {
+            var joke = `<span style='color:#0000ff'>${data[0].data.children[0].data.title}</span><br>${data[0].data.children[0].data.selftext}`
+            resolve(joke);
         })
     })
 }

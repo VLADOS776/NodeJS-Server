@@ -9,7 +9,6 @@ var fbDB             = require('./libs/firebaseDatabase');
 var chatBot          = require('./libs/chatBot');
 var jokes            = require('./libs/joke');
 var steam            = require('./libs/steam');
-
 var app              = express();
 
 app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -23,11 +22,9 @@ app.get('/api/weapons', function(req, res) {
    res.send('Weapons now not working..'); 
 });
 
-app.get('/api/weapons/:id', function(req, res) {
-    fbDB.getWeaponById(req.params.id)
-    .then((weapon) => res.send(weapon))
-    .catch((err) => res.send(err))
-});
+/*app.get('/api/weapons/:id', function(req, res) {
+    res.send(weapons.getWeaponById(req.params.id));
+});*/
 
 app.get('/api/chatBot', function(req, res) {
     log.debug('Chatbot params: %s', req.query);
@@ -41,7 +38,7 @@ app.get('/api/chatBot', function(req, res) {
 
 app.get('/api/joke', function(req, res) {
     log.debug("joke!");
-    jokes()
+    jokes('EN')
     .then(function(joke) {
         res.send(joke);
     })
