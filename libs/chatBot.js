@@ -113,9 +113,22 @@ function listenChatRoom(room) {
             .then(function(data) {
                 var balanceRegExp = /(\d)(?=(\d\d\d)+([^\d]|$))/g;
                 var userInfo = data.val();
+                userInfo.moder = userInfo.moder || {};
                 var textMsg = "@"+userInfo.public.nickname+", " + calcLvl(userInfo.public.points) + " LVL | "+((""+userInfo.private.double).replace(balanceRegExp, '$1&#8198;'))+" double | Trades: "+(userInfo.public.betaTrade == true ? "On" : "Off");
-                if (typeof userInfo.moder != 'undefined' && typeof userInfo.moder.tradeban != 'undefined')
+                
+                if (userInfo.private.double > 10000000000 && !userInfo.moder.tradeban && !userInfo.moder.unbanable) {
+                    userInfo.moder.tradeban = 'Auto ban. Too much money.';
+                    
+                    firebase.database().ref('users/' + uid + '/moder/tradeban').set(userInfo.moder.tradeban);
+                    firebase.database().ref('bans/' + uid + '/tradeban').set(userInfo.moder.tradeban);
+                    
+                    if (userInfo.private.androidID)
+                        firebase.database().ref('androidIDBans/' + uid + '/tradeban').set(userInfo.moder.tradeban);
+                }
+                
+                if (typeof userInfo.moder.tradeban != 'undefined')
                     textMsg+= " | Tradeban: \""+userInfo.moder.tradeban+"\"";
+                
                 chatBotSendMsg(textMsg, room);
             })
         }
@@ -191,10 +204,9 @@ function listenChatRoom(room) {
                 })
             }
         }
-        
     })
-        resetsTimeout[room] = setTimeout(clearChat(room), config.chat.clearTimeout);
-        log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
+    resetsTimeout[room] = setTimeout(function(){clearChat(room)}, config.chat.clearTimeout);
+    log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
 }
 
 function calcLvl(exp) {
@@ -214,7 +226,7 @@ function lvlEXP(lvl) {
         return lvlEXP(lvl-1) + lvl*2;
 }
 
-function clearChat (room) {
+function clearChat(room) {
     var chatRef = firebase.database().ref('chat/'+room);
     (function(chatRef) {
         chatRef.limitToLast(40).once('value', function(snapshot) {
