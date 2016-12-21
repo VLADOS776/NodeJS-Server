@@ -123,7 +123,7 @@ function listenChatRoom(room) {
                     firebase.database().ref('bans/' + uid + '/tradeban').set(userInfo.moder.tradeban);
                     
                     if (userInfo.private.androidID)
-                        firebase.database().ref('androidIDBans/' + uid + '/tradeban').set(userInfo.moder.tradeban);
+                        firebase.database().ref('androidIDBans/' + userInfo.private.androidID + '/tradeban').set(userInfo.moder.tradeban);
                 }
                 
                 if (typeof userInfo.moder.tradeban != 'undefined')
