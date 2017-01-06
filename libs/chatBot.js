@@ -73,13 +73,14 @@ function getLocalizedArr(arr, room) {
 function listenChatRoom(room) {
     var chatRef = firebase.database().ref('chat/'+room);
     chatRef.limitToLast(1).on('child_added', function(snapshot) {
-        var msg = snapshot.val().text;
+        var inf = snapshot.val();
         var msgInfo = {
-            text: msg,
-            uid : snapshot.val().uid,
-            username: snapshot.val().username
+            text: inf.text,
+            uid : inf.uid,
+            username: inf.username,
+            group: inf.group || ""
         }
-        log.debug('%s: %s', snapshot.val().username, msg);
+        log.debug('%s: %s', snapshot.val().username, msgInfo.text);
         
         if (typeof lastMessages[room] == 'undefined')
             lastMessages[room] = [];
@@ -87,20 +88,20 @@ function listenChatRoom(room) {
             lastMessages[room] = lastMessages[room].slice(1);
         lastMessages[room].push(msgInfo);
         
-        if (/^[@]?(chatbot)/i.test(msg)) {
+        if (/^[@]?(chatbot)/i.test(msgInfo.text)) {
             var hello = typeof helloArr[room] == 'undefined' ? helloArr.EN : helloArr[room];
             var sayHello = hello[Math.floor(Math.random()*(hello.length))];
             chatBotSendMsg(sayHello, room);
         }
         
-        if (/^!(donate|patreon)/i.test(msg)) {
+        if (/^!(donate|patreon)/i.test(msgInfo.text)) {
             var textMsg = "<div style=\"padding: 5px;background: #E6461A;color: #fff;border-radius: 10px;text-align: center;text-shadow: 1px 1px RGBA(0, 0, 0, 0.42);border-bottom: 2px solid #953419;margin-bottom: 5px;\"><a href=\"https://www.patreon.com/VLADOS776\" target=\"_blank\" style=\"text-decoration: none;color: #fff;display: block;\">Patreon</a></div><div onclick='if(isAndroid()){client.showVideoAd(\"#\")}' style=\"padding: 5px;background: #63a7ff;color: #fff;border-radius: 10px;text-align: center;text-shadow: 1px 1px RGBA(0, 0, 0, 0.42);border-bottom: 2px solid #186ad7;\">Watch ad</div>";
             chatBotSendMsg(textMsg, room);
         }
         
-        if (/^(?:!stats)(?:[ ]?@(.*?),)?/i.test(msg)) {
+        if (/^(?:!stats)(?:[ ]?@(.*?),)?/i.test(msgInfo.text)) {
             var uid = snapshot.val().uid;
-            var user = msg.match(/^(?:!stats)(?:[ ]?@(.*?),)?/i)[1];
+            var user = msgInfo.text.match(/^(?:!stats)(?:[ ]?@(.*?),)?/i)[1];
             if (typeof user != 'undefined' && user != "") {
                 for (var i = 0; i < lastMessages[room].length; i++) {
                     if (lastMessages[room][i].username == user) {
@@ -133,7 +134,7 @@ function listenChatRoom(room) {
             })
         }
         
-        if (/^!(?:wp|weapon)[ ]?(\d+)/i.test(msg)) {
+        if (/^!(?:wp|weapon)[ ]?(\d+)/i.test(msgInfo.text)) {
             var wpNum = parseInt(snapshot.val().text.match(/^!(?:wp|weapon)[ ]?(\d+)/i)[1]);
             log.debug('Weapon num: '+wpNum);
             var wpInfo = weapons.getWeaponById(wpNum);
@@ -144,18 +145,16 @@ function listenChatRoom(room) {
             }
         }
         
-        if (/^!(?:joke|шутка)/i.test(msg)) {
+        if (/^!(?:joke|шутка)/i.test(msgInfo.text)) {
             joke(room)
             .then(function(joke) {
                 chatBotSendMsg(joke, room);
             })
         }
         
-        //if(/^!(?:trade))
-        
-        if (/^!(?:report)[ ]?@(.*?),(.*$)?/i.test(msg)) {
-            var reported = msg.match(/^!(?:report)[ ]?@(.*?),(.*$)?/i)[1];
-            var reason   = msg.match(/^!(?:report)[ ]?@(.*?),(.*$)?/i)[2];
+        if (/^!(?:report)[ ]?@(.*?),(.*$)?/i.test(msgInfo.text)) {
+            var reported = msgInfo.text.match(/^!(?:report)[ ]?@(.*?),(.*$)?/i)[1];
+            var reason   = msgInfo.text.match(/^!(?:report)[ ]?@(.*?),(.*$)?/i)[2];
             log.debug('Reported: %s. Reason: %s', reported, reason);
             for (var i = 0; i < lastMessages[room].length; i++) {
                 if (lastMessages[room][i].username == reported) {
@@ -177,7 +176,7 @@ function listenChatRoom(room) {
             }
         }
         
-        if (/^!(?:item|itm)[ ]?(\d+)/i.test(msg)) {
+        if (/^!(?:item|itm)[ ]?(\d+)/i.test(msgInfo.text)) {
             var itmNum = parseInt(msg.match(/^!(?:item|itm)[ ]?(\d+)/i)[1]);
             if (typeof items[itmNum] == 'undefined') return;
             var textMsg = "<img src=\""+getImgUrl(items[itmNum].img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
@@ -185,12 +184,12 @@ function listenChatRoom(room) {
             chatBotSendMsg(textMsg, room);
         }
         
-        if (/^!(?:help|commands|info)/i.test(msg)) {
+        if (/^!(?:help|commands|info)/i.test(msgInfo.text)) {
             var answer = getLocalizedArr(help, room);
             chatBotSendMsg(answer, room);
         }
         
-        if (/^!(?:steam) (.*?)$/i.test(msg)) {
+        if (/^!(?:steam) (.*?)$/i.test(msgInfo.text)) {
             var steamID = msg.match(/^!(?:steam) (.*?)$/i)[1];
             if (steamID) {
                 steam.profile(steamID)
@@ -204,6 +203,15 @@ function listenChatRoom(room) {
                 })
             }
         }
+        
+        if (/^!(?:vip)[ _]?(?:all)/ig.test(msgInfo.text) && /vip/.test(msgInfo.group)) {
+            chatBotSendMsg("<script>$('.chat__message').each(function() {if(!$(this).hasClass('vip'))$(this).addClass('vip');})</script>", room);
+        }
+        
+        if (/^!(?:vip)[ _]?(?:rotate)/ig.test(msgInfo.text) && /vip/.test(msgInfo.group)) {
+            chatBotSendMsg("<script>$('.chat__message').each(function() {if(!$(this).hasClass('my_message'))$(this).addClass('my_message');})</script>", room);
+        }
+        
     })
     resetsTimeout[room] = setTimeout(function(){clearChat(room)}, config.chat.clearTimeout);
     log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
