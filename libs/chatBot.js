@@ -177,7 +177,7 @@ function listenChatRoom(room) {
         }
         
         if (/^!(?:item|itm)[ ]?(\d+)/i.test(msgInfo.text)) {
-            var itmNum = parseInt(msg.match(/^!(?:item|itm)[ ]?(\d+)/i)[1]);
+            var itmNum = parseInt(msgInfo.text.match(/^!(?:item|itm)[ ]?(\d+)/i)[1]);
             if (typeof items[itmNum] == 'undefined') return;
             var textMsg = "<img src=\""+getImgUrl(items[itmNum].img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
                           "<br>"+items[itmNum].type+" | "+items[itmNum].skinName;
@@ -190,7 +190,7 @@ function listenChatRoom(room) {
         }
         
         if (/^!(?:steam) (.*?)$/i.test(msgInfo.text)) {
-            var steamID = msg.match(/^!(?:steam) (.*?)$/i)[1];
+            var steamID = msgInfo.text.match(/^!(?:steam) (.*?)$/i)[1];
             if (steamID) {
                 steam.profile(steamID)
                 .then(function(profile) {
