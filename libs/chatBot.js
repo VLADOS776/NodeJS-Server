@@ -20,6 +20,42 @@ function chatBotSendMsg(msg, room) {
 
 var lastMessages = {};
 
+var opacityUsers = {
+    users: {},
+    addUser: function(uid, byWho) {
+        var now = new Date();
+        
+        opacityUsers.users[uid] = {
+            start: now.getTime(),
+            end: now.setMinutes(now.getMinutes() + 10), // 10 min
+            vip: byWho
+        }
+        
+        console.log(`Add user to list`);
+        console.log(opacityUsers);
+    },
+    check: function() {
+        var now = new Date();
+        for (key in opacityUsers.users) {
+            if (opacityUsers.users[key].end < now)
+                opacityUsers.removeUser(key);
+        }
+    },
+    removeUser: function(uid) {
+        delete opacityUsers.users[key]
+    },
+    main: function(msg) {
+        console.log(`Check if need to change opacity`);
+        opacityUsers.check();
+        console.log(opacityUsers.users);
+        if (typeof opacityUsers.users[msg.uid] != 'undefined' /*&& opacityUsers.users[msg.uid].end < new Date().getTime()*/) {
+            console.log('Need to change');            
+            var textMsg = "...<script>$(\"li[data-msgkey='" + msg.msgID + "']\").addClass('vip-blur')</script>"
+            chatBotSendMsg(textMsg, msg.room);
+        }
+    }
+};
+
 var helloArr = {
     RU: ["Hello!", "Привет.", "Дратути", "Хай", "Тут я", "Кто звал?", "Слушаю", "Ало. Да, да. ChatBot, да"],
     EN: ["Hello!", "Sup?", "What m8?", "Hi", "What's up dog!", "Look at my horse! My horse is amazing!", "Hey"]
@@ -37,7 +73,17 @@ var help = {
         <b>!wp (id)</b> or <b>!weapon (id)</b> - get weapon info by id (0-${(weapons.count)})<br>
         <b>!donate</b> - Link to Patreon and button that shows video ad.<br>
         <b>!steam (steamID)</b> - Steam info<br>
-        <b>!joke</b> - random joke (temporarily only in Russian)`
+        <b>!joke</b> - random joke`
+}
+
+var vipHelp = {
+    RU: `Стоимость VIP - $5/месяц<br>
+        Чтобы купить вип, пишите в VK: <a href="http://vk.com/vlados776">vk.com/vlados776</a><br><br>
+        Доступные команды:<br>
+        <b>!vip all</b> - Сделать всех игроков VIP на 1 секунду<br>
+        <b>!vip rorate</b> - Перевернуть чат<br>
+        <b>!vip opacity @(nickname)</b> - Сообщения игрока будут полупрозрачными в течение 10 минут`,
+    EN: `No translation yet ;(`
 }
 
 var resetsTimeout = {};
@@ -78,9 +124,13 @@ function listenChatRoom(room) {
             text: inf.text,
             uid : inf.uid,
             username: inf.username,
-            group: inf.group || ""
+            group: inf.group || "",
+            msgID: snapshot.key,
+            room: room
         }
         log.debug('%s: %s', snapshot.val().username, msgInfo.text);
+        
+        opacityUsers.main(msgInfo);
         
         if (typeof lastMessages[room] == 'undefined')
             lastMessages[room] = [];
@@ -100,7 +150,7 @@ function listenChatRoom(room) {
         }
         
         if (/^(?:!stats)(?:[ ]?@(.*?),)?/i.test(msgInfo.text)) {
-            var uid = snapshot.val().uid;
+            var uid = msgInfo.uid;
             var user = msgInfo.text.match(/^(?:!stats)(?:[ ]?@(.*?),)?/i)[1];
             if (typeof user != 'undefined' && user != "") {
                 for (var i = 0; i < lastMessages[room].length; i++) {
@@ -204,6 +254,10 @@ function listenChatRoom(room) {
             }
         }
         
+        if (/^!vip$/.test(msgInfo.text)) {
+            chatBotSendMsg(getLocalizedArr(vipHelp, room), room);
+        }
+        
         if (/^!(?:vip)[ _]?(?:all)/ig.test(msgInfo.text) && /vip/.test(msgInfo.group)) {
             chatBotSendMsg("<script>$('.chat__message').each(function() {if(!$(this).hasClass('vip'))$(this).addClass('vip');})</script>", room);
         }
@@ -212,6 +266,30 @@ function listenChatRoom(room) {
             chatBotSendMsg("<script>$('.chat__message').each(function() {if(!$(this).hasClass('my_message'))$(this).addClass('my_message');})</script>", room);
         }
         
+        if (/^!(?:vip)[ _]?(?:blur)[ _]?@(.*?),?$/ig.test(msgInfo.text) && /vip/.test(msgInfo.group)) {
+            var uid = "";
+            try {
+                var user = msgInfo.text.match(/^!(?:vip)[ _]?(?:blur)[ _]?@(.*?),/i)[1];
+            } catch (e) {
+                console.log(e);
+                return false;
+            }
+            
+            if (typeof user != 'undefined' && user != "") {
+                for (var i = 0; i < lastMessages[room].length; i++) {
+                    if (lastMessages[room][i].username == user) {
+                        uid = lastMessages[room][i].uid;
+                        break;
+                    }
+                }
+            }
+            console.log(`VIP changed opacity to ${user} | ${uid}`);
+            
+            if (uid == "" || opacityUsers.users[msgInfo.uid])
+                return false;
+            
+            opacityUsers.addUser(uid, msgInfo.username);
+        }
     })
     resetsTimeout[room] = setTimeout(function(){clearChat(room)}, config.chat.clearTimeout);
     log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
