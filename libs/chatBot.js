@@ -1,6 +1,6 @@
 var firebase        = require('firebase');
 var config          = require('./config');
-var weapons         = require('./weapons');
+var Items           = require('./items');
 var joke            = require('./joke');
 var steam           = require('./steam');
 var log             = require('./log')(module);
@@ -64,13 +64,13 @@ var helloArr = {
 var help = {
     RU: `Доступные команды:<br>
         <b>!stats</b> - Статистика игрока<br>
-        <b>!wp (id)</b> или <b>!weapon (id)</b> - информация об оружии по id (0-${(weapons.count)})<br>
+        <b>!wp (id)</b> или <b>!weapon (id)</b> - информация об оружии по id (0-${(Items.count)})<br>
         <b>!donate</b> - Ссылка на Patreon и кнопка для показа рекламы<br>
         <b>!steam (steamID)</b> - немного информации о профиле в стим<br>
         <b>!joke</b> или <b>!шутка</b> - случайная шутка`,
     EN: `Available commands:<br>
         <b>!stats</b> or <b>!stats@(nickname),</b> - Player statistic<br>
-        <b>!wp (id)</b> or <b>!weapon (id)</b> - get weapon info by id (0-${(weapons.count)})<br>
+        <b>!wp (id)</b> or <b>!weapon (id)</b> - get weapon info by id (0-${(Items.count)})<br>
         <b>!donate</b> - Link to Patreon and button that shows video ad.<br>
         <b>!steam (steamID)</b> - Steam info<br>
         <b>!joke</b> - random joke`
@@ -187,10 +187,21 @@ function listenChatRoom(room) {
         if (/^!(?:wp|weapon)[ ]?(\d+)/i.test(msgInfo.text)) {
             var wpNum = parseInt(snapshot.val().text.match(/^!(?:wp|weapon)[ ]?(\d+)/i)[1]);
             log.debug('Weapon num: '+wpNum);
-            var wpInfo = weapons.getWeaponById(wpNum);
+            var wpInfo = Items.getItemByID(wpNum, 'weapons');
             if (wpInfo) {
                 var textMsg = "<img src=\""+getImgUrl(wpInfo.img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
                         "<br>"+wpInfo.type+" | "+wpInfo.skinName;
+                chatBotSendMsg(textMsg, room);
+            }
+        }
+        
+        if (/^!(?:sticker)[ ]?(\d+)/i.test(msgInfo.text)) {
+            var id = parseInt(snapshot.val().text.match(/^!(?:sticker)[ ]?(\d+)/i)[1]);
+            log.debug('Sticker ID: '+id);
+            var info = Items.getItemByID(id, 'stickers');
+            if (info) {
+                var textMsg = "<img src=\""+getImgUrl(info.img, 150)+"\" style='width:150px;height:150px;border-radius:0;cursor:default;'>" +
+                        "<br>"+info.name;
                 chatBotSendMsg(textMsg, room);
             }
         }
