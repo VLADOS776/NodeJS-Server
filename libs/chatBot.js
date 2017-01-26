@@ -296,8 +296,8 @@ function listenChatRoom(room) {
             opacityUsers.addUser(uid, msgInfo.username);
         }
     })
-    resetsTimeout[room] = setTimeout(function(){clearChat(room)}, config.chat.clearTimeout);
-    log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
+    //resetsTimeout[room] = setTimeout(function(){clearChat(room)}, config.chat.clearTimeout);
+    //log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
 }
 
 function calcLvl(exp) {
