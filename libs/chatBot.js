@@ -30,9 +30,6 @@ var opacityUsers = {
             end: now.setMinutes(now.getMinutes() + 10), // 10 min
             vip: byWho
         }
-        
-        console.log(`Add user to list`);
-        console.log(opacityUsers);
     },
     check: function() {
         var now = new Date();
@@ -45,11 +42,8 @@ var opacityUsers = {
         delete opacityUsers.users[key]
     },
     main: function(msg) {
-        console.log(`Check if need to change opacity`);
         opacityUsers.check();
-        console.log(opacityUsers.users);
-        if (typeof opacityUsers.users[msg.uid] != 'undefined' /*&& opacityUsers.users[msg.uid].end < new Date().getTime()*/) {
-            console.log('Need to change');            
+        if (typeof opacityUsers.users[msg.uid] != 'undefined' /*&& opacityUsers.users[msg.uid].end < new Date().getTime()*/) {         
             var textMsg = "...<script>$(\"li[data-msgkey='" + msg.msgID + "']\").addClass('vip-blur')</script>"
             chatBotSendMsg(textMsg, msg.room);
         }
