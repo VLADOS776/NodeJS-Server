@@ -75,8 +75,8 @@ var vipHelp = {
         Чтобы купить вип, пишите в VK: <a href="http://vk.com/vlados776">vk.com/vlados776</a><br><br>
         Доступные команды:<br>
         <b>!vip all</b> - Сделать всех игроков VIP на 1 секунду<br>
-        <b>!vip rorate</b> - Перевернуть чат<br>
-        <b>!vip opacity @(nickname)</b> - Сообщения игрока будут полупрозрачными в течение 10 минут`,
+        <b>!vip rotate</b> - Перевернуть чат<br>
+        <b>!vip blur @(nickname)</b> - Сообщения игрока будут размытыми в течение 10 минут`,
     EN: `No translation yet ;(`
 }
 
@@ -288,16 +288,15 @@ function listenChatRoom(room) {
                     }
                 }
             }
-            console.log(`VIP changed opacity to ${user} | ${uid}`);
             
-            if (uid == "" || opacityUsers.users[msgInfo.uid])
+            if (uid == "" || opacityUsers.users[msgInfo.uid] || uid == 'TrgkhCFTfVWdgOhZVUEAwxKyIo33')
                 return false;
             
             opacityUsers.addUser(uid, msgInfo.username);
         }
     })
-    //resetsTimeout[room] = setTimeout(function(){clearChat(room)}, config.chat.clearTimeout);
-    //log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
+    resetsTimeout[room] = setTimeout(function(){clearChat(room)}, config.chat.clearTimeout);
+    log.debug("Clear timeout starts. Room \"%s\" will be cleared in %s", room,config.chat.clearTimeout)
 }
 
 function calcLvl(exp) {
